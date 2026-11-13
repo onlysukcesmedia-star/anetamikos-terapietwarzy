@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Manualna terapia twarzy – Aneta Mikos,  Wodzisław Slaski</title>
+<meta name="description" content="Zapisz się na manualną terapię twarzy (90 min) w  Wodzisławiu Slaskim. Wypełnij krótki formularz – oddzwonimy, aby umówić termin.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1c1511">
+<link rel="preload" as="image" href="img/tlo.jpg">
+<link rel="prefetch" href="img/zdjecie.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #ffffff;
+    --ink-soft: rgba(255, 255, 255, .78);
+    --line: rgba(255, 255, 255, .55);
+    --surface: rgba(255, 255, 255, .08);
+    --surface-hover: rgba(255, 255, 255, .16);
+    --accent: #d39a83;
+    --accent-dark: #ba8873;
+    --selected: rgba(200, 146, 124, 0.72);
+    --btn-hover: #f7ede9;
+    --error: #ffb4a8;
+    --radius: 10px;
+    --bg: #1c1511;
+    --panel: #231c18;
+    --font-head: "Cormorant Garamond";
+    --font-body: "Manrope";
+    --bg-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.62)), url("img/tlo.jpg") 58% center / cover no-repeat, #1c1511;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Zdjęcie w tle na cały ekran z przyciemnieniem (osobny element – background-attachment: fixed nie działa na iPhone) */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg-image);
+  }
+  .brand {
+    padding: 20px 24px 0;
+    font-family: var(--font-head), Georgia, serif;
+    font-size: 20px;
+    letter-spacing: .04em;
+    color: #fff;
+  }
+  .brand small {
+    display: block;
+    font-family: var(--font-body), sans-serif;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .brand img.logo { display: block; max-height: 44px; max-width: 220px; }
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 28px 20px 120px;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, .35);
+  }
+  @media (min-width: 900px) { main { padding-top: 6vh; } }
+  .step { animation: in .4s ease both; }
+  @keyframes in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  .offer {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 18px;
+    line-height: 1.45;
+    margin-bottom: 16px;
+    text-shadow: none;
+  }
+  .nowrap { white-space: nowrap; }
+  .qnum { font-size: 15px; color: var(--ink-soft); margin-bottom: 6px; }
+  h1 {
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-weight: 600;
+    font-size: clamp(24px, 4.2vw, 36px);
+    line-height: 1.3;
+    margin: 0 0 22px;
+  }
+  .hint { color: var(--ink-soft); font-size: 15px; margin: 0 0 14px; }
+  .req { color: var(--accent); }
+
+  /* Kafelki ze zdjęciami */
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (min-width: 640px) { .tiles { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
+  .tile {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-shadow: none;
+    backdrop-filter: blur(2px);
+    transition: background .15s, border-color .15s, transform .15s;
+  }
+  .tile:hover { background: var(--surface-hover); transform: translateY(-2px); }
+  .tile .ph { aspect-ratio: 4 / 3; overflow: hidden; background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.04)); }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.04); }
+  .tile .lbl { display: flex; gap: 10px; align-items: center; padding: 10px 12px 12px; font-size: 14px; font-weight: 500; line-height: 1.35; }
+
+  /* Lista opcji */
+  .opts { display: grid; gap: 14px; max-width: 450px; }
+  .opt {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 16px 16px 18px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 17px;
+    color: inherit;
+    text-align: left;
+    text-shadow: none;
+    backdrop-filter: blur(2px);
+    transition: background .15s, border-color .15s;
+  }
+  .opt:hover, .nav:not(:disabled):hover { background: var(--surface-hover); }
+  .key {
+    order: 2;
+    margin-left: auto;
+    flex: none;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #fff;
+    color: #2a201b;
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .sel { background: var(--selected) !important; border-color: #fff !important; box-shadow: 0 0 0 1px #fff; }
+  .sel .key { background: #fff; color: var(--accent-dark); }
+  .tile .check {
+    position: absolute; top: 10px; right: 10px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: none; place-items: center; font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+  .tile.sel .check { display: grid; }
+
+  /* Pola tekstowe */
+  .field {
+    display: flex; align-items: center;
+    max-width: 520px;
+    border-bottom: 1px solid var(--line);
+    transition: border-color .15s;
+  }
+  .field:focus-within { border-color: #fff; }
+  .field input, .field textarea {
+    flex: 1; min-width: 0;
+    border: 0; background: transparent; outline: none;
+    font: inherit; font-size: 24px; color: #fff;
+    padding: 10px 0;
+  }
+  .field textarea { font-size: 19px; resize: vertical; min-height: 90px; }
+  .field input::placeholder, .field textarea::placeholder { color: rgba(255, 255, 255, .45); }
+  .prefix { font-size: 20px; padding-right: 10px; margin-right: 10px; border-right: 1px solid var(--line); white-space: nowrap; }
+  .consent {
+    display: flex; gap: 12px; align-items: flex-start;
+    max-width: 600px; margin-top: 28px;
+    font-size: 13px; color: var(--ink-soft); cursor: pointer;
+  }
+  .consent input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--accent); flex: none; }
+  .rodo { max-width: 600px; margin-top: 16px; font-size: 12px; color: var(--ink-soft); }
+  .rodo a { color: #fff; }
+
+  .err { color: var(--error); font-size: 14px; margin-top: 14px; min-height: 21px; }
+  .actions { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+  .btn {
+    background: #fff; color: #2a201b;
+    border: 0; border-radius: var(--radius);
+    font: inherit; font-weight: 700; font-size: 15px; letter-spacing: .05em;
+    padding: 14px 30px; cursor: pointer;
+    text-shadow: none;
+    transition: background .15s, opacity .15s;
+  }
+  .btn:hover { background: var(--btn-hover); }
+  .btn:disabled { opacity: .6; cursor: default; }
+  .enter-hint { font-size: 12px; color: var(--ink-soft); }
+  @media (hover: none) { .enter-hint { display: none; } }
+
+  /* Pasek dolny */
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, .55));
+    padding: 18px 20px calc(14px + env(safe-area-inset-bottom));
+  }
+  .bar-in { max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+  .progress { flex: 1; height: 4px; background: rgba(255, 255, 255, .25); border-radius: 99px; overflow: hidden; }
+  .progress i { display: block; height: 100%; width: 0; background: #fff; transition: width .35s ease; }
+  .pct { font-size: 13px; font-weight: 600; color: #fff; width: 38px; text-align: right; }
+  .nav { width: 42px; height: 42px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: #fff; cursor: pointer; font-size: 16px; }
+  .nav:disabled { opacity: .35; cursor: default; }
+
+  .done { text-align: center; padding-top: 8vh; }
+  .avatar { position: relative; width: 104px; height: 104px; margin: 0 auto 18px; }
+  .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; border: 3px solid #fff; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+  .avatar .online { position: absolute; right: 4px; bottom: 4px; width: 24px; height: 24px; border-radius: 50%; background: #31a24c; border: 4px solid var(--bg); }
+  .done p { color: var(--ink-soft); max-width: 480px; margin: 0 auto 10px; }
+  .done b { color: #fff; }
+  .msgr-box { margin: 34px auto 0; max-width: 520px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,.25); }
+  .msgr {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: #fff; color: #2a201b;
+    font-weight: 700; font-size: 17px; text-decoration: none;
+    padding: 16px 30px; border-radius: 99px;
+    text-shadow: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    animation: pulse 2.4s ease-in-out 1s infinite;
+    transition: transform .15s;
+  }
+  .msgr:hover { transform: scale(1.03); }
+  .done .msgr-hint {
+    margin: 22px auto 0; max-width: 440px;
+    padding: 14px 18px;
+    background: rgba(0, 0, 0, .45);
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 14px;
+    color: #fff; font-size: 16px; font-weight: 600; line-height: 1.5;
+  }
+  .msgr-start {
+    display: inline-block;
+    background: #0866ff; color: #fff;
+    padding: 1px 12px; border-radius: 99px;
+    font-weight: 700; text-shadow: none;
+  }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,.35), 0 0 0 0 rgba(255,255,255,.45); } 50% { box-shadow: 0 10px 30px rgba(0,0,0,.35), 0 0 0 12px rgba(255,255,255,0); } }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  /* Baner zgody na cookies – cienki pasek na dole */
+  .cookies {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+    gap: 6px 14px;
+    background: rgba(20, 15, 12, .97);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255, 255, 255, .2);
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    text-shadow: none;
+  }
+  .cookies[hidden], .ck-modal[hidden] { display: none; }
+  .ck-panel h2 { margin: 0 0 8px; font-size: 17px; font-weight: 700; color: #fff; }
+  .cookies p { margin: 0; font-size: 12px; line-height: 1.4; color: var(--ink-soft); text-align: center; }
+  .cookies .cookies-btns { flex-wrap: nowrap; gap: 6px; }
+  .cookies .cbtn { flex: 0 0 auto; font-size: 12px; padding: 7px 12px; border-radius: 8px; }
+  .cookies a, .ck-panel a, .rodo .ck-open { color: #fff; }
+  .cookies-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cbtn {
+    flex: 1 1 140px;
+    font: inherit; font-size: 14px; font-weight: 700;
+    padding: 12px 14px; border-radius: var(--radius); cursor: pointer;
+    background: transparent; color: #fff; border: 1px solid #fff;
+  }
+  .cbtn-ok { background: #fff; color: #2a201b; }
+
+  .ck-modal {
+    position: fixed; inset: 0; z-index: 20;
+    background: rgba(0, 0, 0, .6);
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px;
+  }
+  .ck-panel {
+    position: relative;
+    width: 100%; max-width: 640px; max-height: 90vh; max-height: 90dvh;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    background: var(--panel); color: #fff;
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 16px;
+    padding: 22px 18px 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+    text-shadow: none;
+  }
+  .ck-panel h2 { font-size: 19px; padding-right: 36px; }
+  .ck-close { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3); background: transparent; color: #fff; font-size: 20px; cursor: pointer; line-height: 1; }
+  .ck-intro { font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0 0 16px; }
+  .ck-cat { border-top: 1px solid rgba(255, 255, 255, .15); padding: 14px 0; }
+  .ck-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .ck-name { font-weight: 700; font-size: 15px; }
+  .ck-always { font-size: 12px; font-weight: 700; color: #7ed58f; white-space: nowrap; }
+  .ck-desc { font-size: 13px; line-height: 1.5; color: var(--ink-soft); margin: 6px 0 0; }
+  .ck-cat details { margin-top: 8px; font-size: 13px; }
+  .ck-cat summary { cursor: pointer; color: #fff; font-weight: 600; }
+  .ck-cookie { margin: 10px 0 0; padding: 10px 12px; background: rgba(255,255,255,.06); border-radius: 10px; line-height: 1.5; color: var(--ink-soft); }
+  .ck-cookie b { color: #fff; }
+  .ck-none { margin: 8px 0 0; color: var(--ink-soft); font-style: italic; }
+  .ck-panel .cookies-btns { margin-top: 14px; position: sticky; bottom: -18px; background: var(--panel); padding: 12px 0 4px; }
+  .switch { position: relative; flex: none; width: 46px; height: 26px; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+  .switch span { position: absolute; inset: 0; border-radius: 99px; background: rgba(255,255,255,.25); transition: background .15s; }
+  .switch span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  .switch input:checked + span { background: #31a24c; }
+  .switch input:checked + span::after { transform: translateX(20px); }
+  .switch input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true"></div>
+
+<div class="brand">
+  <small>Manualna Terapeutka Twarzy</small>
+  Aneta Mikos
+</div>
+
+<main id="app" aria-live="polite"></main>
+
+<div class="cookies" id="cookies" role="dialog" aria-label="Zgoda na pliki cookie" hidden>
+  <p>Używamy plików cookie do analizy ruchu i reklam. <a class="ck-privacy" href="#" target="_blank" rel="noopener">Polityka prywatności</a></p>
+  <div class="cookies-btns">
+    <button type="button" class="cbtn" data-ck="customize">Spersonalizuj</button>
+    <button type="button" class="cbtn cbtn-ok" data-ck="accept">Zezwól na wszystkie</button>
+  </div>
+</div>
+
+<div class="ck-modal" id="ck-modal" hidden>
+  <div class="ck-panel" role="dialog" aria-modal="true" aria-labelledby="ck-m-title">
+    <button type="button" class="ck-close" data-ck="close" aria-label="Zamknij">×</button>
+    <h2 id="ck-m-title">Dostosuj preferencje dotyczące zgody</h2>
+    <p class="ck-intro">Używamy plików cookie, aby pomóc użytkownikom w sprawnej nawigacji i wykonywaniu określonych funkcji. Szczegółowe informacje na temat wszystkich plików cookie odpowiadających poszczególnym kategoriom zgody znajdują się poniżej. Pliki cookie sklasyfikowane jako „niezbędne” są przechowywane w przeglądarce użytkownika, ponieważ są niezbędne do włączenia podstawowych funkcji witryny. Korzystamy również z plików cookie innych firm, które pomagają nam analizować sposób korzystania ze strony przez użytkowników, a także przechowywać preferencje użytkownika oraz dostarczać mu istotnych dla niego treści i reklam. Tego typu pliki cookie będą przechowywane w przeglądarce tylko za uprzednią zgodą użytkownika. Można włączyć lub wyłączyć niektóre lub wszystkie te pliki cookie, ale wyłączenie niektórych z nich może wpłynąć na jakość przeglądania. <a class="ck-privacy" href="#" target="_blank" rel="noopener">Polityka prywatności</a></p>
+    <div id="ck-cats"></div>
+    <div class="cookies-btns">
+      <button type="button" class="cbtn" data-ck="reject">Odrzuć</button>
+      <button type="button" class="cbtn" data-ck="save">Zapisz moje preferencje</button>
+      <button type="button" class="cbtn cbtn-ok" data-ck="accept">Zezwól na wszystkie</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pułapka na boty – ludzie tego pola nie widzą -->
+<div class="hp" aria-hidden="true"><input id="website" tabindex="-1" autocomplete="off"></div>
+
+<div class="bar" id="bar">
+  <div class="bar-in">
+    <div class="progress"><i id="progress"></i></div>
+    <span class="pct" id="pct">0%</span>
+    <button class="nav" id="prev" aria-label="Poprzednie pytanie">↑</button>
+    <button class="nav" id="next" aria-label="Następne pytanie">↓</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   KONFIGURACJA FORMULARZA – wygenerowana w generatorze.
+   Najwygodniej zmieniaj ją w generatorze i pobierz paczkę ponownie.
+   ========================================================= */
+window.FORM = {
+  "brand": {
+    "small": "Manualna Terapeutka Twarzy",
+    "name": "Aneta Mikos"
+  },
+  "offer": "Manualna Terapia Twarzy 90 min + Bezpłatna Konsultacja",
+  "leadName": "Manualna terapia twarzy",
+  "buttons": {
+    "next": "NASTĘPNE",
+    "submit": "WYŚLIJ ZGŁOSZENIE"
+  },
+  "steps": [
+    {
+      "id": "obszary",
+      "type": "tiles",
+      "title": "Co najbardziej chciałabyś poprawić w wyglądzie swojej twarzy?",
+      "hint": "Wybierz tyle, ile chcesz",
+      "required": true,
+      "options": [
+        {
+          "label": "Zmarszczki – bruzdę nosowo-wargową",
+          "value": "Bruzda nosowo-wargowa",
+          "img": "img/obszary-1.jpg"
+        },
+        {
+          "label": "Lwią zmarszczkę",
+          "value": "Lwia zmarszczka",
+          "img": "img/obszary-2.jpg"
+        },
+        {
+          "label": "Opadający owal twarzy",
+          "img": "img/obszary-3.jpg"
+        },
+        {
+          "label": "Worki i opuchliznę pod oczami",
+          "value": "Worki i opuchlizna pod oczami",
+          "img": "img/obszary-4.jpg"
+        },
+        {
+          "label": "Podwójny podbródek",
+          "img": "img/obszary-5.jpg"
+        },
+        {
+          "label": "Chcę kompleksowo odmłodzić twarz",
+          "value": "Kompleksowe odmłodzenie",
+          "img": "img/obszary-6.jpg"
+        }
+      ]
+    },
+    {
+      "id": "imie",
+      "type": "name",
+      "title": "Jak masz na imię?",
+      "hint": "",
+      "required": true,
+      "placeholder": "Wpisz swoje imię"
+    },
+    {
+      "id": "dni",
+      "type": "multi",
+      "title": "{imie}, jaki dzień jest dla Ciebie najbardziej odpowiedni, aby przyjść na wizytę wraz z konsultacją?",
+      "hint": "Wybierz tyle, ile chcesz",
+      "required": true,
+      "options": [
+        {
+          "label": "Poniedziałek"
+        },
+        {
+          "label": "Wtorek"
+        },
+        {
+          "label": "Środa"
+        },
+        {
+          "label": "Czwartek"
+        },
+        {
+          "label": "Piątek"
+        }
+      ]
+    },
+    {
+      "id": "godziny",
+      "type": "multi",
+      "title": "Jaki przedział godzinowy wizyty najbardziej Ci odpowiada?",
+      "hint": "Wybierz tyle, ile chcesz",
+      "required": true,
+      "options": [
+        {
+          "label": "Rano (10:00–12:00)"
+        },
+        {
+          "label": "Po południu (12:00–16:00)"
+        },
+        {
+          "label": "Późne popołudnie (16:00–21:00)"
+        }
+      ]
+    },
+    {
+      "id": "telefon",
+      "type": "phone",
+      "title": "Następnie zadzwonię do Ciebie w celu dokończenia procesu rejestracji. Jaki jest Twój numer telefonu?",
+      "hint": "",
+      "required": true,
+      "placeholder": "Numer telefonu"
+    },
+    {
+      "id": "email",
+      "type": "email",
+      "title": "Na podany przez Ciebie adres e-mail wyślę potwierdzenie wysłania zgłoszenia",
+      "hint": "",
+      "required": true,
+      "placeholder": "Wpisz swój adres e-mail"
+    }
+  ],
+  "phone": {
+    "prefix": "+48",
+    "flag": "🇵🇱",
+    "digits": 9,
+    "groups": [
+      3,
+      3,
+      3
+    ]
+  },
+  "consent": {
+    "text": "Wyrażam dobrowolną zgodę na przetwarzanie podanych przeze mnie danych osobowych przez Małgorzatę Kozę w celach marketingowych, w tym w celu realizacji usługi wysyłania Newslettera na podany przeze mnie adres e-mail."
+  },
+  "rodo": "Administratorem Twoich danych jest Aneta Mikos. Imię, telefon i e-mail wykorzystamy, aby skontaktować się z Tobą w sprawie wizyty.",
+  "privacyUrl": "https://docs.google.com/document/d/1vErTJ-G4q_4Nkf7wFxyuScS-NTBRKZs_iElj7qCa0jk/edit?usp=drive_web&ouid=110954868303531110421",
+  "avatar": "img/zdjecie.jpg",
+  "thanks": {
+    "title": "Dziękuję, {imie}!",
+    "text": "Twoje zgłoszenie zostało przyjęte. Wkrótce zadzwonię do Ciebie, aby ustalić dokładny termin wizyty.\n\nPotwierdzenie wysłałam na adres **{email}**.",
+    "online": true,
+    "messengerUrl": "https://m.me/1281140665085380?ref=w63283575",
+    "messengerLabel": "Wyślij do mnie wiadomość",
+    "messengerHint": "Przejdź na Messengera i kliknij [Rozpocznij], a wyślę Ci zdjęcia przed i po moich podopiecznych"
+  },
+  "scriptUrl": "https://script.google.com/macros/s/AKfycbwtYc5bSoUxZ_-PwxMQsfvLhmK2_3NTBGGA552NcpgrTEF_51RB4BWb9QKf7c6DFkG_/exec",
+  "pixelId": "2313175112815765",
+  "city": "wodzislawslaski",
+  "country": "pl"
+};
+</script>
+<script>
+(function () {
+"use strict";
+const F = window.FORM;
+const STEPS = F.steps;
+const PREVIEW = F.preview || null;
+const app = document.getElementById("app");
+const isMulti = s => s.type === "tiles" || s.type === "multi";
+const isChoice = s => isMulti(s) || s.type === "single";
+const optVal = o => (o.value || o.label);
+
+const answers = {};
+STEPS.forEach(s => { answers[s.id] = isMulti(s) ? [] : ""; });
+let consent = false;
+let current = 0;
+let sending = false;
+const startedAt = Date.now();
+const byType = t => STEPS.find(s => s.type === t);
+const nameStep = byType("name"), phoneStep = byType("phone"), emailStep = byType("email");
+
+// Źródło kampanii (UTM / fbclid) – zapamiętane na czas sesji
+const TRACK_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid"];
+const tracking = (() => {
+  let saved = {};
+  try {
+    const params = new URLSearchParams(location.search);
+    try { saved = JSON.parse(sessionStorage.getItem("lead_tracking") || "{}"); } catch (e) {}
+    TRACK_KEYS.forEach(k => { if (params.get(k)) saved[k] = params.get(k); });
+    try { sessionStorage.setItem("lead_tracking", JSON.stringify(saved)); } catch (e) {}
+  } catch (e) {}
+  return saved;
+})();
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const letter = i => String.fromCharCode(65 + i);
+const digitsOf = v => String(v || "").replace(/\D/g, "");
+const phoneDigits = () => phoneStep ? digitsOf(answers[phoneStep.id]) : "";
+const answerText = id => { const v = answers[id]; return Array.isArray(v) ? v.join(", ") : String(v == null ? "" : v).trim(); };
+
+// "{imie}, jaki dzień…" → "Anna, jaki dzień…"; bez imienia → "Jaki dzień…"
+function fill(t) {
+  return String(t || "").replace(/\{(\w+)\}(,\s*)?(\S)?/g, (m, id, comma, ch) => {
+    const v = answerText(id);
+    if (v) return v + (comma || "") + (ch || "");
+    return comma ? (ch || "").toUpperCase() : (ch || "");
+  });
+}
+// Tekst z **pogrubieniem**, [przyciskiem] i {odpowiedziami} → HTML
+function rich(t) {
+  return esc(t)
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/\[(.+?)\]/g, '<span class="msgr-start">$1</span>')
+    .replace(/\{(\w+)\}/g, (m, id) => esc(answerText(id)));
+}
+
+function validate(step) {
+  const v = answers[step.id];
+  const empty = Array.isArray(v) ? !v.length : !String(v).trim();
+  if (!step.required && empty) return "";
+  if (isMulti(step)) return v.length ? "" : "Wybierz co najmniej jedną odpowiedź.";
+  if (step.type === "single") return v ? "" : "Wybierz odpowiedź.";
+  if (step.type === "name") return v.trim().length >= 2 ? "" : "Wpisz swoje imię.";
+  if (step.type === "text") return v.trim() ? "" : "Uzupełnij odpowiedź.";
+  if (step.type === "phone") return phoneDigits().length === F.phone.digits ? "" : "Podaj " + F.phone.digits + "-cyfrowy numer telefonu.";
+  if (step.type === "email") return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? "" : "Podaj poprawny adres e-mail.";
+  return "";
+}
+
+function render() {
+  const step = STEPS[current];
+  const last = current === STEPS.length - 1;
+  const v = answers[step.id];
+  let body = "";
+
+  if (step.type === "tiles") {
+    body = `<div class="tiles">${step.options.map((o, i) => `
+      <button type="button" class="tile${v.includes(optVal(o)) ? " sel" : ""}" data-v="${esc(optVal(o))}" aria-pressed="${v.includes(optVal(o))}">
+        <div class="ph">${o.img ? `<img src="${o.img}" alt="${esc(o.label)}" loading="${i < 4 ? "eager" : "lazy"}">` : ""}</div>
+        <span class="check">✓</span>
+        <span class="lbl"><span class="key">${letter(i)}</span>${esc(o.label)}</span>
+      </button>`).join("")}</div>`;
+  } else if (step.type === "multi" || step.type === "single") {
+    const on = o => step.type === "single" ? v === optVal(o) : v.includes(optVal(o));
+    body = `<div class="opts">${step.options.map((o, i) => `
+      <button type="button" class="opt${on(o) ? " sel" : ""}" data-v="${esc(optVal(o))}" aria-pressed="${on(o)}">
+        <span class="key">${letter(i)}</span>${esc(o.label)}
+      </button>`).join("")}</div>`;
+  } else if (step.type === "name") {
+    body = `<div class="field"><input id="inp" type="text" placeholder="${esc(step.placeholder || "")}" autocomplete="given-name" value="${esc(v)}" maxlength="60"></div>`;
+  } else if (step.type === "text") {
+    body = step.multiline
+      ? `<div class="field"><textarea id="inp" placeholder="${esc(step.placeholder || "")}" maxlength="500">${esc(v)}</textarea></div>`
+      : `<div class="field"><input id="inp" type="text" placeholder="${esc(step.placeholder || "")}" value="${esc(v)}" maxlength="200"></div>`;
+  } else if (step.type === "phone") {
+    body = `<div class="field"><span class="prefix">${esc((F.phone.flag ? F.phone.flag + " " : "") + F.phone.prefix)}</span><input id="inp" type="tel" inputmode="tel" placeholder="${esc(step.placeholder || "")}" autocomplete="tel-national" value="${esc(v)}" maxlength="${F.phone.digits + 6}"></div>`;
+  } else if (step.type === "email") {
+    body = `<div class="field"><input id="inp" type="email" inputmode="email" placeholder="${esc(step.placeholder || "")}" autocomplete="email" value="${esc(v)}" maxlength="120"></div>`;
+  }
+
+  if (last) {
+    if (F.consent.text) body += `<label class="consent"><input type="checkbox" id="zgoda"${consent ? " checked" : ""}><span>${esc(F.consent.text)}</span></label>`;
+    body += `<p class="rodo">${esc(F.rodo)}${F.privacyUrl ? ` <a href="${esc(F.privacyUrl)}" target="_blank" rel="noopener">Polityka prywatności</a>` : ""} <a href="#" class="ck-open">Ustawienia cookies</a></p>`;
+  }
+
+  app.innerHTML = `<section class="step">
+    ${current === 0 && F.offer ? `<div class="offer"><span>${esc(F.offer)}</span></div>` : ""}
+    <div class="qnum">Pytanie ${current + 1} z ${STEPS.length}</div>
+    <h1>${esc(fill(step.title))}${step.required ? ' <span class="req">*</span>' : ""}</h1>
+    <p class="hint">${step.hint ? esc(step.hint) : ""}</p>
+    ${body}
+    <div class="err" id="err" role="alert"></div>
+    <div class="actions">
+      <button type="button" class="btn" id="go">${esc(last ? F.buttons.submit : F.buttons.next)}</button>
+      <span class="enter-hint">lub naciśnij <b>Enter ↵</b></span>
+    </div>
+  </section>`;
+
+  app.querySelectorAll("[data-v]").forEach(el => el.addEventListener("click", () => toggle(el.dataset.v)));
+  const inp = document.getElementById("inp");
+  if (inp) {
+    inp.addEventListener("input", () => {
+      if (step.type === "phone") inp.value = inp.value.replace(/[^\d ]/g, "");
+      answers[step.id] = inp.value;
+      document.getElementById("err").textContent = "";
+      updateBar();
+    });
+    if (!PREVIEW && window.matchMedia("(hover: hover)").matches) inp.focus();
+  }
+  const zgoda = document.getElementById("zgoda");
+  if (zgoda) zgoda.addEventListener("change", () => { consent = zgoda.checked; });
+  document.getElementById("go").addEventListener("click", next);
+
+  updateBar();
+  if (!PREVIEW) window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function toggle(val) {
+  const step = STEPS[current];
+  if (step.type === "single") {
+    answers[step.id] = answers[step.id] === val ? "" : val;
+  } else {
+    const list = answers[step.id];
+    const i = list.indexOf(val);
+    i === -1 ? list.push(val) : list.splice(i, 1);
+  }
+  const cur = answers[step.id];
+  app.querySelectorAll("[data-v]").forEach(el => {
+    const on = Array.isArray(cur) ? cur.includes(el.dataset.v) : cur === el.dataset.v;
+    el.classList.toggle("sel", on);
+    el.setAttribute("aria-pressed", on);
+  });
+  document.getElementById("err").textContent = "";
+  updateBar();
+  // Jednokrotny wybór – przejście dalej automatycznie
+  if (step.type === "single" && cur && current < STEPS.length - 1) setTimeout(() => { if (STEPS[current] === step) next(); }, 350);
+}
+
+function updateBar() {
+  const answered = STEPS.filter(s => { const v = answers[s.id]; const empty = Array.isArray(v) ? !v.length : !String(v).trim(); return !empty && !validate(s); }).length;
+  const pct = Math.round(answered / STEPS.length * 100);
+  document.getElementById("progress").style.width = pct + "%";
+  document.getElementById("pct").textContent = pct + "%";
+  document.getElementById("prev").disabled = current === 0;
+  document.getElementById("next").disabled = current === STEPS.length - 1;
+}
+
+function next() {
+  if (sending) return;
+  const step = STEPS[current];
+  const msg = validate(step);
+  if (msg) { document.getElementById("err").textContent = msg; return; }
+  if (current === STEPS.length - 1) return submit();
+  current++;
+  render();
+}
+
+function prev() {
+  if (current > 0) { current--; render(); }
+}
+
+function formatPhone() {
+  const d = phoneDigits();
+  const groups = F.phone.groups || [];
+  let out = [], i = 0;
+  groups.forEach(n => { if (i < d.length) { out.push(d.slice(i, i + n)); i += n; } });
+  if (i < d.length) out.push(d.slice(i));
+  return F.phone.prefix + " " + out.join(" ");
+}
+
+async function submit() {
+  sending = true;
+  const btn = document.getElementById("go");
+  btn.disabled = true;
+  btn.textContent = "WYSYŁANIE…";
+
+  const payload = {};
+  STEPS.forEach(s => {
+    const v = answers[s.id];
+    payload[s.id] = s.type === "phone" ? formatPhone() : Array.isArray(v) ? v.slice() : String(v).trim();
+  });
+  Object.assign(payload, {
+    zgoda: consent,
+    czas_wypelniania_s: Math.round((Date.now() - startedAt) / 1000),
+    strona: location.origin + location.pathname,
+    website: document.getElementById("website").value
+  }, tracking);
+
+  try {
+    if (F.scriptUrl && !PREVIEW) {
+      // text/plain = brak zapytania CORS preflight, które Apps Script odrzuca
+      await fetch(F.scriptUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+    } else {
+      console.info("[TRYB TESTOWY] Zgłoszenie nie zostało wysłane – brak adresu skryptu.", payload);
+    }
+    if (window.fbq && F.pixelId) {
+      // Zaawansowane dopasowanie: piksel sam haszuje te dane, dzięki czemu Meta lepiej przypisuje leady do reklam
+      const am = {};
+      if (emailStep && payload[emailStep.id]) am.em = payload[emailStep.id].toLowerCase();
+      if (phoneStep) am.ph = digitsOf(F.phone.prefix) + phoneDigits();
+      if (nameStep && payload[nameStep.id]) am.fn = payload[nameStep.id].toLowerCase();
+      if (F.city) am.ct = F.city;
+      if (F.country) am.country = F.country;
+      fbq("init", F.pixelId, am);
+      fbq("track", "Lead", { content_name: F.leadName || document.title });
+    }
+    done();
+  } catch (e) {
+    sending = false;
+    btn.disabled = false;
+    btn.textContent = "SPRÓBUJ PONOWNIE";
+    document.getElementById("err").textContent = "Nie udało się wysłać zgłoszenia. Sprawdź połączenie z internetem i spróbuj ponownie.";
+  }
+}
+
+function done() {
+  document.getElementById("progress").style.width = "100%";
+  document.getElementById("pct").textContent = "100%";
+  document.getElementById("bar").style.display = "none";
+  const T = F.thanks;
+  // Akapit pomijamy, jeśli wszystkie jego {odpowiedzi} są puste (np. brak e-maila)
+  const paras = String(T.text || "").split(/\n\s*\n/).filter(p => {
+    const ids = p.match(/\{(\w+)\}/g);
+    return p.trim() && (!ids || ids.some(x => answerText(x.slice(1, -1))));
+  });
+  app.innerHTML = `<section class="step done">
+    ${F.avatar ? `<div class="avatar"><img src="${F.avatar}" alt="${esc(F.brand.name)}" width="104" height="104">${T.online ? '<span class="online" aria-label="Dostępna"></span>' : ""}</div>` : ""}
+    <h1>${esc(fill(T.title))}</h1>
+    ${paras.map(p => `<p>${rich(p).replace(/\n/g, "<br>")}</p>`).join("")}
+    ${T.messengerUrl ? `
+    <div class="msgr-box">
+      <a class="msgr" id="msgr" href="${esc(T.messengerUrl)}">
+        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+          <defs><linearGradient id="mg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#0866ff"/><stop offset=".6" stop-color="#a033ff"/><stop offset="1" stop-color="#ff5c87"/></linearGradient></defs>
+          <path fill="url(#mg)" d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.14.26.35.27.57l.05 1.78c.02.57.6.94 1.12.71l1.99-.88c.17-.07.36-.09.54-.04.91.25 1.88.39 2.89.39 5.64 0 10-4.13 10-9.7S17.64 2 12 2z"/>
+          <path fill="#fff" d="M6 14.54l2.94-4.66c.47-.74 1.47-.93 2.17-.4l2.34 1.75c.21.16.51.16.72 0l3.16-2.4c.42-.32.97.18.69.63l-2.94 4.66c-.47.74-1.47.93-2.17.4l-2.34-1.75a.6.6 0 0 0-.72 0l-3.16 2.4c-.42.32-.97-.18-.69-.63z"/>
+        </svg>
+        ${esc(T.messengerLabel || "Wyślij wiadomość")}
+      </a>
+      ${T.messengerHint ? `<p class="msgr-hint">${rich(T.messengerHint)}</p>` : ""}
+    </div>` : ""}
+  </section>`;
+  const msgr = document.getElementById("msgr");
+  if (msgr) msgr.addEventListener("click", () => { if (window.fbq) fbq("track", "Contact"); });
+}
+
+document.getElementById("prev").addEventListener("click", prev);
+document.getElementById("next").addEventListener("click", next);
+
+document.addEventListener("keydown", e => {
+  if (sending || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.closest && e.target.closest(".cookies, .ck-modal")) return;
+  if (!document.getElementById("ck-modal").hidden) return;
+  if (e.target.tagName === "TEXTAREA") return;
+  if (e.key === "Enter" && !e.target.classList.contains("nav")) { e.preventDefault(); next(); return; }
+  const step = STEPS[current];
+  if (step && isChoice(step) && e.target.tagName !== "INPUT" && /^[a-z]$/i.test(e.key)) {
+    const opt = step.options[e.key.toUpperCase().charCodeAt(0) - 65];
+    if (opt) toggle(optVal(opt));
+  }
+});
+
+// Piksel Meta – ładuje się dopiero po zgodzie na cookies (RODO)
+function loadPixel() {
+  if (!F.pixelId || window.fbq || PREVIEW) return;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq("init", F.pixelId);
+  fbq("track", "PageView");
+}
+
+// Zgoda na cookies – kategorie i pliki cookie faktycznie używane na tej stronie
+const CONSENT_KEY = "cookie_consent";
+const COOKIE_CATEGORIES = [
+  { id: "niezbedne", name: "Niezbędne", always: true,
+    desc: "Niezbędne pliki cookie mają kluczowe znaczenie dla podstawowych funkcji witryny i witryna nie będzie działać w zamierzony sposób bez nich. Te pliki cookie nie przechowują żadnych danych umożliwiających identyfikację osoby.",
+    cookies: [{ name: "cookie_consent", period: "Do czasu usunięcia przez użytkownika", desc: "Zapamiętuje Twoje wybory dotyczące plików cookie (pamięć przeglądarki)." }] },
+  { id: "funkcjonalne", name: "Funkcjonalny",
+    desc: "Funkcjonalne pliki cookie pomagają wykonywać pewne funkcje, takie jak udostępnianie zawartości witryny na platformach mediów społecznościowych, zbieranie informacji zwrotnych i inne funkcje stron trzecich.", cookies: [] },
+  { id: "analityka", name: "Analityka",
+    desc: "Analityczne pliki cookie służą do zrozumienia, w jaki sposób użytkownicy wchodzą w interakcję z witryną. Te pliki cookie pomagają dostarczać informacje o metrykach liczby odwiedzających, współczynniku odrzuceń, źródle ruchu itp.", cookies: [] },
+  { id: "wydajnosc", name: "Wydajność",
+    desc: "Wydajnościowe pliki cookie służą do zrozumienia i analizy kluczowych wskaźników wydajności witryny, co pomaga zapewnić lepsze wrażenia użytkownika dla odwiedzających.", cookies: [] },
+  { id: "reklama", name: "Reklama",
+    desc: "Reklamowe pliki cookie służą do dostarczania użytkownikom spersonalizowanych reklam w oparciu o strony, które odwiedzili wcześniej, oraz do analizowania skuteczności kampanii reklamowej.",
+    cookies: F.pixelId ? [
+      { name: "_fbp", period: "3 miesiące", desc: "Meta (Facebook) – identyfikuje przeglądarkę, aby mierzyć skuteczność reklam i dopasowywać je do użytkownika." },
+      { name: "_fbc", period: "3 miesiące", desc: "Meta (Facebook) – zapisuje identyfikator kliknięcia reklamy, aby przypisać zgłoszenie do reklamy, z której przyszło." },
+      { name: "fr", period: "3 miesiące", desc: "Meta (facebook.com) – służy do wyświetlania, mierzenia i poprawiania trafności reklam." }
+    ] : [] },
+  { id: "nieskategoryzowane", name: "Nieskategoryzowane", info: true,
+    desc: "Inne nieskategoryzowane pliki cookie to te, które są analizowane i nie zostały jeszcze zaklasyfikowane do żadnej kategorii.", cookies: [] }
+];
+const OPTIONAL = COOKIE_CATEGORIES.filter(c => !c.always && !c.info).map(c => c.id);
+
+function getConsent() {
+  let raw = null;
+  try { raw = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+  if (!raw) return null;
+  if (raw === "granted" || raw === "denied") return Object.fromEntries(OPTIONAL.map(id => [id, raw === "granted"]));
+  try { return JSON.parse(raw); } catch (e) { return null; }
+}
+
+function applyConsent(c) {
+  if (c.reklama) { loadPixel(); if (window.fbq) fbq("consent", "grant"); }
+  else if (window.fbq) fbq("consent", "revoke");
+}
+
+function saveConsent(c) {
+  try { localStorage.setItem(CONSENT_KEY, JSON.stringify(c)); } catch (e) {}
+  document.getElementById("cookies").hidden = true;
+  closeCookieSettings();
+  applyConsent(c);
+}
+
+function renderCookieCategories() {
+  const cur = getConsent() || {};
+  document.getElementById("ck-cats").innerHTML = COOKIE_CATEGORIES.map(c => `
+    <div class="ck-cat">
+      <div class="ck-head">
+        <span class="ck-name">${c.name}</span>
+        ${c.always ? '<span class="ck-always">Zawsze aktywne</span>'
+          : c.info ? ""
+          : `<label class="switch"><input type="checkbox" data-cat="${c.id}" aria-label="${c.name}"${cur[c.id] ? " checked" : ""}><span></span></label>`}
+      </div>
+      <p class="ck-desc">${c.desc}</p>
+      ${c.info ? "" : `<details><summary>Pliki cookie (${c.cookies.length})</summary>${
+        c.cookies.length
+          ? c.cookies.map(k => `<div class="ck-cookie"><b>Plik cookie:</b> ${k.name}<br><b>Okres:</b> ${k.period}<br><b>Opis:</b> ${k.desc}</div>`).join("")
+          : '<p class="ck-none">Ta strona nie używa plików cookie z tej kategorii.</p>'
+      }</details>`}
+    </div>`).join("");
+}
+
+function openCookieSettings() {
+  renderCookieCategories();
+  document.getElementById("ck-modal").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function closeCookieSettings() {
+  document.getElementById("ck-modal").hidden = true;
+  document.body.style.overflow = "";
+}
+
+function initCookies() {
+  document.querySelectorAll(".ck-privacy").forEach(a => { if (F.privacyUrl) a.href = F.privacyUrl; else a.remove(); });
+  document.addEventListener("click", e => {
+    if (e.target.closest(".ck-open")) { e.preventDefault(); openCookieSettings(); return; }
+    const btn = e.target.closest("[data-ck]");
+    if (!btn) return;
+    const action = btn.dataset.ck;
+    const all = value => Object.fromEntries(OPTIONAL.map(id => [id, value]));
+    if (action === "customize") openCookieSettings();
+    if (action === "close") closeCookieSettings();
+    if (action === "accept") saveConsent(all(true));
+    if (action === "reject") saveConsent(all(false));
+    if (action === "save") {
+      const chosen = all(false);
+      document.querySelectorAll("#ck-cats input[data-cat]").forEach(i => { chosen[i.dataset.cat] = i.checked; });
+      saveConsent(chosen);
+    }
+  });
+  document.getElementById("ck-modal").addEventListener("click", e => { if (e.target.id === "ck-modal") closeCookieSettings(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !document.getElementById("ck-modal").hidden) closeCookieSettings(); });
+
+  if (PREVIEW) { if (PREVIEW.cookies) document.getElementById("cookies").hidden = false; return; }
+  const c = getConsent();
+  if (c) applyConsent(c);
+  else document.getElementById("cookies").hidden = false;
+}
+
+initCookies();
+
+if (PREVIEW) {
+  // Podgląd w generatorze: przykładowe odpowiedzi i wybrany ekran
+  if (nameStep) answers[nameStep.id] = "Anna";
+  if (emailStep) answers[emailStep.id] = "anna@przyklad.pl";
+  if (phoneStep) answers[phoneStep.id] = "600 000 000";
+  STEPS.forEach(s => { if (isChoice(s) && s.options.length && PREVIEW.step === "done") answers[s.id] = s.type === "single" ? optVal(s.options[0]) : [optVal(s.options[0])]; });
+  if (PREVIEW.step === "done") { done(); }
+  else { current = Math.max(0, Math.min(STEPS.length - 1, PREVIEW.step | 0)); render(); }
+} else {
+  render();
+}
+})();
+
+</script>
+</body>
+</html>
